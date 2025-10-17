@@ -1,0 +1,91 @@
+name: Destroy Sembix Studio
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version reference (e.g., v1.2.3, main)'
+        required: true
+        type: string
+      terraform_ref:
+        description: 'Terraform workflow version (tag, branch, or commit)'
+        required: false
+        type: string
+        default: 'v1.1.0'
+      environment:
+        description: 'Target environment to destroy (e.g., dev, prod, customer-specific)'
+        required: true
+        type: string
+      require_approval:
+        description: 'Require manual approval before destroying (highly recommended)'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  destroy-sembix-studio:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Checkout Sembix Studio code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Checkout Terraform Infrastructure
+        uses: actions/checkout@v3
+        with:
+          repository: sembix-ai/terraform-sembix-studio
+          token: ${{ steps.generate-token.outputs.token }}
+          path: terraform-infra
+          ref: ${{ inputs.terraform_ref }}
+
+      - name: Destroy Sembix Studio
+        uses: ./terraform-infra/.github/actions/destroy
+        with:
+          version: ${{ inputs.version }}
+          environment: ${{ inputs.environment }}
+          require_approval: ${{ inputs.require_approval }}
+          github_token: ${{ steps.generate-token.outputs.token }}
+          deployment_approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
+
+          # AWS Core
+          aws_region: ${{ secrets.AWS_REGION }}
+          tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
+          customer_role_arn: ${{ secrets.CUSTOMER_ROLE_ARN }}
+
+          # ECR Repositories
+          engine_ecr_repository_url: ${{ secrets.ENGINE_ECR_REPOSITORY_URL }}
+          migrations_ecr_repository_url: ${{ secrets.MIGRATIONS_ECR_REPOSITORY_URL }}
+          bff_ecr_repository_url: ${{ secrets.BFF_ECR_REPOSITORY_URL }}
+
+          # Shared Services
+          sembix_hub_aws_account_id: ${{ secrets.SEMBIX_HUB_AWS_ACCOUNT_ID }}
+          sembix_hub_studio_secret_name: ${{ secrets.SEMBIX_HUB_STUDIO_SECRET_NAME }}
+          sembix_hub_studio_kms_key_id: ${{ secrets.SEMBIX_HUB_STUDIO_KMS_KEY_ID }}
+
+          # Database Configuration
+          sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
+          sembix_studio_user: ${{ secrets.SEMBIX_STUDIO_USER }}
+
+          # Storage & Artifacts
+          sembix_studio_artifact_s3_bucket: ${{ secrets.SEMBIX_STUDIO_ARTIFACT_S3_BUCKET }}
+
+          # IAM Roles (optional)
+          sembix_studio_memory_role_arn: ${{ secrets.SEMBIX_STUDIO_MEMORY_ROLE_ARN }}
+          sembix_studio_notification_role_arn: ${{ secrets.SEMBIX_STUDIO_NOTIFICATION_ROLE_ARN }}
+
+          approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
