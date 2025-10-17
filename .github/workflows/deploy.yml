@@ -11,7 +11,7 @@ on:
         description: 'Terraform workflow version (tag, branch, or commit)'
         required: false
         type: string
-        default: 'v1.5.2'
+        default: 'v2.0.0'
       environment:
         description: 'Target environment (e.g., dev, prod, customer-specific)'
         required: true
