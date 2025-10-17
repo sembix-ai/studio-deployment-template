@@ -11,7 +11,7 @@ on:
         description: 'Terraform workflow version (tag, branch, or commit)'
         required: false
         type: string
-        default: 'v1.1.0'
+        default: 'v2.0.0'
       environment:
         description: 'Target environment to destroy (e.g., dev, prod, customer-specific)'
         required: true
@@ -72,7 +72,7 @@ jobs:
           migrations_ecr_repository_url: ${{ secrets.MIGRATIONS_ECR_REPOSITORY_URL }}
           bff_ecr_repository_url: ${{ secrets.BFF_ECR_REPOSITORY_URL }}
 
-          # Shared Services
+          # Sembix Hub & Cross-Account
           sembix_hub_aws_account_id: ${{ secrets.SEMBIX_HUB_AWS_ACCOUNT_ID }}
           sembix_hub_studio_secret_name: ${{ secrets.SEMBIX_HUB_STUDIO_SECRET_NAME }}
           sembix_hub_studio_kms_key_id: ${{ secrets.SEMBIX_HUB_STUDIO_KMS_KEY_ID }}

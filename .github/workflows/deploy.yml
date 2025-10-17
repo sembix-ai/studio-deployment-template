@@ -207,7 +207,7 @@ jobs:
           migrations_ecr_repository_url: ${{ secrets.MIGRATIONS_ECR_REPOSITORY_URL }}
           bff_ecr_repository_url: ${{ secrets.BFF_ECR_REPOSITORY_URL }}
 
-          # Shared Services & Cross-Account
+          # Sembix Hub & Cross-Account
           sembix_hub_aws_account_id: ${{ secrets.SEMBIX_HUB_AWS_ACCOUNT_ID }}
           sembix_hub_studio_secret_name: ${{ secrets.SEMBIX_HUB_STUDIO_SECRET_NAME }}
           sembix_hub_studio_kms_key_id: ${{ secrets.SEMBIX_HUB_STUDIO_KMS_KEY_ID }}
