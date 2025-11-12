@@ -43,6 +43,8 @@ Click "Use this template" to create a new repository from this template.
 
 Set up GitHub environments (e.g., `dev`, `staging`, `prod`) with the required secrets and variables.
 
+**Quick Setup with Backstage UI**: Visit [backstage.studio.sembix.ai](https://backstage.studio.sembix.ai) to quickly create and manage environment secrets and variables through a user-friendly interface.
+
 ### 3. Configure Required Secrets
 
 Navigate to your repository's Settings > Secrets and variables > Actions, and configure the following secrets for each environment:
@@ -53,6 +55,7 @@ Navigate to your repository's Settings > Secrets and variables > Actions, and co
 - `AWS_REGION`: AWS region (e.g., `us-east-1`)
 - `CUSTOMER_ROLE_ARN`: IAM role ARN for deployment
 - `DEPLOYMENT_APPROVERS`: Comma-separated list of GitHub usernames who can approve deployments
+- `IAM_ROLE_PATH`: (Optional) IAM role path for bootstrap (defaults to `/`)
 
 #### ECR Repositories
 - `ENGINE_ECR_REPOSITORY_URL`: ECR URL for workflow engine images
@@ -133,32 +136,50 @@ Set the following variables in Settings > Secrets and variables > Actions > Vari
 
 ## Deploying Sembix Studio
 
-### First-Time Deployment
+### First-Time Deployment (Bootstrap)
 
-For the first deployment to a new environment:
+For the first deployment to a new environment, you must run the bootstrap phase first:
+
+#### Phase 1: Bootstrap
+
+1. Go to **Actions** > **Deploy Sembix Studio**
+2. Click **Run workflow**
+3. Configure the bootstrap:
+   - **version**: Sembix Studio version (e.g., `v1.2.3` or `main`)
+   - **terraform_ref**: Terraform workflow version (default: `v3.0.0`)
+   - **environment**: Target environment name
+   - **deployment_phase**: Select **bootstrap**
+   - **require_approval**: Select **true** for manual approval (recommended)
+4. Click **Run workflow**
+5. Save the IAM role ARNs from the bootstrap output - you'll need these for the deploy phase
+
+#### Phase 2: Main Deployment
+
+After bootstrap completes and offline communications are finalized:
 
 1. Go to **Actions** > **Deploy Sembix Studio**
 2. Click **Run workflow**
 3. Configure the deployment:
-   - **version**: Sembix Studio version to deploy (e.g., `v1.2.3` or `main`)
-   - **terraform_ref**: Terraform workflow version (default: `v1.5.2`)
-   - **environment**: Target environment name
-   - **run_bootstrap**: Select **true** for first-time setup
+   - **version**: Same Sembix Studio version used in bootstrap
+   - **terraform_ref**: Same Terraform version (default: `v3.0.0`)
+   - **environment**: Same environment name
+   - **deployment_phase**: Select **deploy**
    - **run_migrations**: Select **true** to run database migrations
    - **deploy_ui**: Select **true** to deploy the UI
-   - **require_approval**: Select **true** for manual approval (recommended)
+   - **require_approval**: Select **true** for safety (recommended)
 4. Click **Run workflow**
 
 ### Subsequent Deployments
 
-For updates to an existing environment:
+For updates to an existing environment (after initial bootstrap and deploy):
 
 1. Go to **Actions** > **Deploy Sembix Studio**
 2. Click **Run workflow**
 3. Configure the deployment:
    - **version**: New version to deploy
+   - **terraform_ref**: Terraform version (default: `v3.0.0`)
    - **environment**: Target environment
-   - **run_bootstrap**: Leave as **false**
+   - **deployment_phase**: Select **deploy** (bootstrap is only needed once)
    - **run_migrations**: Select **true** if database changes are included
    - **deploy_ui**: Select **true** to update the UI
    - **require_approval**: Select **true** for safety
@@ -168,19 +189,41 @@ For updates to an existing environment:
 
 ### Deploy Workflow
 
-The deployment workflow consists of three main stages:
+The deployment workflow is split into two separate phases based on the `deployment_phase` input:
 
-1. **Validate**: Validates configuration and prerequisites
-2. **Bootstrap** (conditional): First-time infrastructure setup
-   - Creates base AWS resources
-   - Sets up networking and security groups
-   - Configures IAM roles and policies
-3. **Deploy**: Deploys Sembix Studio
-   - Builds and pushes Docker images
-   - Runs database migrations (if enabled)
+#### Bootstrap Phase
+
+When `deployment_phase` is set to **bootstrap**:
+
+1. **Validate Bootstrap Configuration**: Validates bootstrap-specific configuration
+   - Verifies AWS authentication
+   - Checks IAM role path settings
+   - Validates terraform state bucket access
+2. **Bootstrap Infrastructure**: Creates foundational IAM roles
+   - Creates ECS task execution and task roles
+   - Sets up RDS Proxy IAM role
+   - Configures cross-account access policies
+   - **Important**: Save the output IAM role ARNs for the deploy phase
+
+#### Deploy Phase
+
+When `deployment_phase` is set to **deploy**:
+
+1. **Validate Deploy Configuration**: Validates deployment configuration
+   - Verifies all ECR repository URLs
+   - Checks Sembix Hub integration settings
+   - Validates database, networking, and security configurations
+   - Confirms IAM roles exist (from bootstrap)
+2. **Deploy Sembix Studio**: Deploys the full Sembix Studio stack
    - Deploys infrastructure via Terraform
+   - Sets up VPC, subnets, and security groups (if not using custom)
+   - Creates Aurora PostgreSQL database with RDS Proxy
+   - Deploys ECS services (workflow engine, BFF)
+   - Runs database migrations (if enabled)
    - Deploys UI to S3/CloudFront (if enabled)
-   - Updates ECS services
+   - Configures Application Load Balancer and DNS
+
+**Note**: Bootstrap and deploy are run as separate workflow executions. This allows for an offline communication pause between creating IAM roles and deploying the main infrastructure.
 
 ### Destroy Workflow
 
@@ -190,12 +233,35 @@ Use the destroy workflow to tear down an environment:
 2. Click **Run workflow**
 3. Configure:
    - **version**: Version reference
-   - **terraform_ref**: Terraform version used for deployment
+   - **terraform_ref**: Terraform version used for deployment (default: `v3.0.0`)
    - **environment**: Environment to destroy
    - **require_approval**: Highly recommended to leave as **true**
 4. Click **Run workflow**
 
-**Warning**: This action is destructive and will delete all resources in the specified environment.
+**Warning**: This action is destructive and will delete all resources in the specified environment. Note that IAM roles created by the bootstrap phase will remain and must be destroyed separately if needed.
+
+## Managing Configuration with Backstage UI
+
+For a streamlined configuration management experience, Sembix provides a Backstage UI hosted at [backstage.studio.sembix.ai](https://backstage.studio.sembix.ai).
+
+### Features
+
+- **Quick Environment Setup**: Create GitHub environments with all required secrets and variables
+- **Template-Based Configuration**: Use pre-configured templates for common deployment scenarios
+- **Validation**: Real-time validation of configuration values
+- **Secure**: Direct integration with GitHub's secrets API
+- **Documentation**: Inline help for each configuration parameter
+
+### Using Backstage UI
+
+1. Navigate to [backstage.studio.sembix.ai](https://backstage.studio.sembix.ai)
+2. Authenticate with your GitHub account
+3. Select your repository from the deployment template
+4. Choose your target environment (dev, staging, prod, etc.)
+5. Fill in the configuration form with your environment-specific values
+6. Review and submit to create all secrets and variables automatically
+
+This eliminates the need to manually configure secrets in GitHub's UI, reducing setup time and potential configuration errors.
 
 ## Architecture
 
