@@ -1,0 +1,11 @@
+{
+  "name": "Sembix Studio Deploy",
+  "description": "Provides read-only access so Sembix Studio deploy and destroy workflows can download Terraform modules and deployment files.",
+  "url": "https://sembix.ai",
+  "public": true,
+  "default_permissions": {
+    "contents": "read",
+    "metadata": "read"
+  },
+  "default_events": []
+}
