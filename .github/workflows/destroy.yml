@@ -38,7 +38,7 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
+          owner: sembix-ai
 
       - name: Checkout Sembix Studio code
         uses: actions/checkout@v3
