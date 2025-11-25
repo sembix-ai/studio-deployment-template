@@ -43,7 +43,7 @@ jobs:
       - name: Checkout Sembix Studio code
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.version }}
+          token: ${{ github.token }}
 
       - name: Checkout Terraform Infrastructure
         uses: actions/checkout@v3
