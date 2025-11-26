@@ -11,27 +11,20 @@ on:
         description: 'Terraform workflow version (tag, branch, or commit)'
         required: false
         type: string
-        default: 'v3.3.2'
+        default: 'v3.4.0'
       environment:
         description: 'Target environment (e.g., dev, prod, customer-specific)'
         required: true
         type: string
       deployment_phase:
-        description: 'Deployment phase to run'
+        description: 'Deployment phase: bootstrap (first-time setup), deploy (infrastructure + migrations + UI), migrations (migrations ONLY)'
         required: true
         type: choice
         default: deploy
         options:
           - bootstrap
           - deploy
-      run_migrations:
-        description: 'Run database migrations (deploy phase only)'
-        type: boolean
-        default: true
-      deploy_ui:
-        description: 'Deploy UI to S3/CloudFront (deploy phase only)'
-        type: boolean
-        default: true
+          - migrations
       require_approval:
         description: 'Require manual approval before deploying'
         type: boolean
@@ -169,6 +162,94 @@ jobs:
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
 
+  # Step 1c: Validate migrations configuration (runs only for migrations phase)
+  validate-migrations:
+    if: inputs.deployment_phase == 'migrations'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: sembix-ai
+
+      - name: Checkout Sembix Studio code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+
+      - name: Checkout Terraform Infrastructure
+        uses: actions/checkout@v3
+        with:
+          repository: sembix-ai/sembix-studio-infrastructure
+          token: ${{ steps.generate-token.outputs.token }}
+          path: terraform-infra
+          ref: ${{ inputs.terraform_ref }}
+
+      - name: Validate migrations configuration
+        uses: ./terraform-infra/.github/actions/validate-deploy-configuration
+        with:
+          version: ${{ inputs.version }}
+          environment: ${{ inputs.environment }}
+          auth_method: 'oidc'
+          aws_region: ${{ secrets.AWS_REGION }}
+          tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
+          customer_role_arn: ${{ secrets.CUSTOMER_ROLE_ARN }}
+
+          # ECR Repositories
+          engine_ecr_repository_url: ${{ secrets.ENGINE_ECR_REPOSITORY_URL }}
+          migrations_ecr_repository_url: ${{ secrets.MIGRATIONS_ECR_REPOSITORY_URL }}
+          bff_ecr_repository_url: ${{ secrets.BFF_ECR_REPOSITORY_URL }}
+          semantic_event_engine_ecr_repository_url: ${{ secrets.SEMANTIC_EVENT_ENGINE_ECR_REPOSITORY_URL }}
+
+          # Sembix Hub & Cross Account
+          sembix_hub_aws_account_id: ${{ secrets.SEMBIX_HUB_AWS_ACCOUNT_ID }}
+          sembix_hub_studio_secret_name: ${{ secrets.SEMBIX_HUB_STUDIO_SECRET_NAME }}
+          sembix_hub_studio_kms_key_id: ${{ secrets.SEMBIX_HUB_STUDIO_KMS_KEY_ID }}
+          sembix_hub_consumer_role_arn: ${{ secrets.SEMBIX_HUB_HUB_CONSUMER_ROLE_ARN }}
+          sembix_hub_admin_role_arn: ${{ secrets.SEMBIX_HUB_HUB_ADMIN_ROLE_ARN }}
+          sembix_hub_app_config_role_arn: ${{ secrets.SEMBIX_HUB_APP_CONFIG_ROLE_ARN }}
+          sembix_hub_app_config_app_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_APP_ID }}
+          sembix_hub_app_config_env_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_ENV_ID }}
+          sembix_hub_app_config_profile_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_PROFILE_ID }}
+          sembix_hub_engine_execution_role: ${{ secrets.SEMBIX_HUB_ENGINE_EXECUTION_ROLE }}
+
+          # Database
+          sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
+          sembix_studio_user: ${{ secrets.SEMBIX_STUDIO_USER }}
+
+          # Storage
+          sembix_studio_artifact_s3_bucket: ${{ secrets.SEMBIX_STUDIO_ARTIFACT_S3_BUCKET }}
+
+          # Optional configurations
+          use_custom_networking: ${{ secrets.USE_CUSTOM_NETWORKING }}
+          custom_vpc_id: ${{ secrets.CUSTOM_VPC_ID }}
+          custom_public_subnet_ids: ${{ secrets.CUSTOM_PUBLIC_SUBNET_IDS }}
+          custom_private_subnet_ids: ${{ secrets.CUSTOM_PRIVATE_SUBNET_IDS }}
+          use_custom_iam_policies: ${{ secrets.USE_CUSTOM_IAM_POLICIES }}
+          workflow_engine_execution_role_arn: ${{ secrets.WORKFLOW_ENGINE_EXECUTION_ROLE_ARN }}
+          workflow_engine_task_role_arn: ${{ secrets.WORKFLOW_ENGINE_TASK_ROLE_ARN }}
+          bff_ecs_task_execution_role_arn: ${{ secrets.BFF_ECS_TASK_EXECUTION_ROLE_ARN }}
+          bff_ecs_task_role_arn: ${{ secrets.BFF_ECS_TASK_ROLE_ARN }}
+          rds_proxy_role_arn: ${{ secrets.RDS_PROXY_ROLE_ARN }}
+          semantic_event_engine_execution_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_EXECUTION_ROLE_ARN }}
+          semantic_event_engine_task_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_TASK_ROLE_ARN }}
+          use_custom_security_groups: ${{ secrets.USE_CUSTOM_SECURITY_GROUPS }}
+          custom_workflow_engine_sg_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_SG_ID }}
+          custom_aurora_sg_id: ${{ secrets.CUSTOM_AURORA_SG_ID }}
+          custom_rds_proxy_sg_id: ${{ secrets.CUSTOM_RDS_PROXY_SG_ID }}
+          custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
+          custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
+          bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
+
   # Step 2: Bootstrap (conditional, first-time only)
   bootstrap:
     needs: validate-bootstrap
@@ -251,8 +332,6 @@ jobs:
         with:
           version: ${{ inputs.version }}
           environment: ${{ inputs.environment }}
-          run_migrations: ${{ inputs.run_migrations }}
-          deploy_ui: ${{ inputs.deploy_ui }}
           require_approval: ${{ inputs.require_approval }}
           github_token: ${{ steps.generate-token.outputs.token }}
 
@@ -344,3 +423,49 @@ jobs:
 
           # Approvers
           approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
+
+  # Step 4: Run migrations only
+  run-migrations:
+    needs: validate-migrations
+    if: inputs.deployment_phase == 'migrations'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Generate GitHub App token
+        id: generate-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: sembix-ai
+
+      - name: Checkout Sembix Studio code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ github.token }}
+
+      - name: Checkout Terraform Infrastructure
+        uses: actions/checkout@v3
+        with:
+          repository: sembix-ai/sembix-studio-infrastructure
+          token: ${{ steps.generate-token.outputs.token }}
+          path: terraform-infra
+          ref: ${{ inputs.terraform_ref }}
+
+      - name: Run Database Migrations
+        uses: ./terraform-infra/.github/actions/run-migrations
+        with:
+          environment: ${{ inputs.environment }}
+          migrations_image_tag: ${{ inputs.version }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
+          customer_role_arn: ${{ secrets.CUSTOMER_ROLE_ARN }}
+          require_approval: ${{ inputs.require_approval }}
+          github_token: ${{ steps.generate-token.outputs.token }}
+          approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
+          migrations_ecr_repository_url: ${{ secrets.MIGRATIONS_ECR_REPOSITORY_URL }}

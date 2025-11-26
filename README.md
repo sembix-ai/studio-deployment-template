@@ -119,17 +119,37 @@ For updates to an existing environment (after initial bootstrap and deploy):
    - **version**: New version to deploy
    - **terraform_ref**: Terraform version (default: `v3.0.0`)
    - **environment**: Target environment
-   - **deployment_phase**: Select **deploy** (bootstrap is only needed once)
-   - **run_migrations**: Select **true** if database changes are included
-   - **deploy_ui**: Select **true** to update the UI
+   - **deployment_phase**: Select **deploy** to deploy everything (infrastructure + migrations + UI)
    - **require_approval**: Select **true** for safety
 4. Click **Run workflow**
+
+## Running Migrations Only
+
+To run database migrations without deploying infrastructure or UI (useful for schema updates between releases):
+
+1. Go to **Actions** > **Deploy Sembix Studio**
+2. Click **Run workflow**
+3. Configure the migration run:
+   - **version**: Sembix Studio version containing the migrations
+   - **terraform_ref**: Terraform version (default: `v3.0.0`)
+   - **environment**: Target environment
+   - **deployment_phase**: Select **migrations**
+   - **require_approval**: Select **true** for safety (recommended)
+4. Click **Run workflow**
+
+> **Important**: The migrations phase ONLY runs database migrations. It does NOT deploy infrastructure or UI changes. Use the deploy phase (above) to deploy everything.
+
+**When to use migrations-only phase:**
+- Running database schema updates without changing infrastructure
+- Applying hotfix migrations
+- Testing migrations before full deployment
+- Incremental database changes between releases
 
 ## Workflow Details
 
 ### Deploy Workflow
 
-The deployment workflow is split into two separate phases based on the `deployment_phase` input:
+The deployment workflow is split into three separate phases based on the `deployment_phase` input:
 
 #### Bootstrap Phase
 
@@ -159,9 +179,24 @@ When `deployment_phase` is set to **deploy**:
    - Sets up VPC, subnets, and security groups (if not using custom)
    - Creates Aurora PostgreSQL database with RDS Proxy
    - Deploys ECS services (workflow engine, BFF)
-   - Runs database migrations (if enabled)
-   - Deploys UI to S3/CloudFront (if enabled)
+   - Runs database migrations
+   - Deploys UI to S3/CloudFront
    - Configures Application Load Balancer and DNS
+
+#### Migrations Phase
+
+When `deployment_phase` is set to **migrations**:
+
+1. **Validate Migrations Configuration**: Validates configuration needed for migrations
+   - Verifies AWS authentication and database connectivity
+   - Checks migrations ECR repository
+   - Validates networking configuration for database access
+   - Confirms Sembix Hub integration for secrets
+2. **Run Database Migrations**: Executes database migrations only
+   - Pulls the migrations container from ECR
+   - Connects to Aurora PostgreSQL via RDS Proxy
+   - Runs pending migrations
+   - **Does NOT deploy infrastructure or UI components**
 
 **Note**: Bootstrap and deploy are run as separate workflow executions. This allows for an offline communication pause between creating IAM roles and deploying the main infrastructure.
 
