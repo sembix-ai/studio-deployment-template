@@ -87,7 +87,7 @@ jobs:
           github_token: ${{ steps.generate-token.outputs.token }}
           approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
           deploy_ui: 'true'
-          sembix_hub_aws_account_id: ${{ secrets.SHARED_SERVICES_AWS_ACCOUNT_ID }}
+          sembix_hub_aws_account_id: ${{ secrets.SEMBIX_HUB_AWS_ACCOUNT_ID }}
 
       - name: Deployment Summary
         env:
