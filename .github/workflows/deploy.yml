@@ -415,6 +415,9 @@ jobs:
           vite_github_app_name: ${{ vars.VITE_GITHUB_APP_NAME }}
           vite_jira_client_id: ${{ vars.VITE_JIRA_CLIENT_ID }}
 
+          # Logging
+          log_level: ${{ secrets.LOG_LEVEL }}
+
           # Module Configuration
           enable_bpa: ${{ vars.ENABLE_BPA }}
           deploy_sembix_studio_memory: ${{ vars.DEPLOY_SEMBIX_STUDIO_MEMORY }}

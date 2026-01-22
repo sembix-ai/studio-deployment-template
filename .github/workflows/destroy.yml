@@ -139,14 +139,6 @@ jobs:
           # Logging
           log_level: ${{ secrets.LOG_LEVEL }}
 
-          # EventBridge
-          eventbridge_bus_name: ${{ secrets.EVENTBRIDGE_BUS_NAME }}
-          enable_eventbridge: ${{ secrets.ENABLE_EVENTBRIDGE }}
-
-          # KMS Keys
-          workflow_runs_key_alias: ${{ secrets.WORKFLOW_RUNS_KEY_ALIAS }}
-          sembix_artifacts_key_alias: ${{ secrets.SEMBIX_ARTIFACTS_KEY_ALIAS }}
-
           # Module Configuration
           enable_bpa: ${{ vars.ENABLE_BPA }}
           deploy_sembix_studio_memory: ${{ vars.DEPLOY_SEMBIX_STUDIO_MEMORY }}
