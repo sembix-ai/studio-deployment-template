@@ -71,6 +71,7 @@ jobs:
           migrations_ecr_repository_url: ${{ secrets.MIGRATIONS_ECR_REPOSITORY_URL }}
           bff_ecr_repository_url: ${{ secrets.BFF_ECR_REPOSITORY_URL }}
           semantic_event_engine_ecr_repository_url: ${{ secrets.SEMANTIC_EVENT_ENGINE_ECR_REPOSITORY_URL }}
+          workspace_runtime_ecr_repository_url: ${{ secrets.WORKSPACE_RUNTIME_ECR_REPOSITORY_URL }}
 
           # Sembix Hub & Cross-Account
           sembix_hub_aws_account_id: ${{ secrets.SEMBIX_HUB_AWS_ACCOUNT_ID }}
@@ -111,6 +112,8 @@ jobs:
           custom_bastion_sg_id: ${{ secrets.CUSTOM_BASTION_SG_ID }}
           custom_bff_alb_sg_id: ${{ secrets.CUSTOM_BFF_ALB_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
+          custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
+          custom_workspace_runtime_efs_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_EFS_SG_ID }}
 
           # IAM Roles & Policies
           use_custom_iam_policies: ${{ secrets.USE_CUSTOM_IAM_POLICIES }}
@@ -121,6 +124,8 @@ jobs:
           rds_proxy_role_arn: ${{ secrets.RDS_PROXY_ROLE_ARN }}
           semantic_event_engine_execution_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_EXECUTION_ROLE_ARN }}
           semantic_event_engine_task_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_TASK_ROLE_ARN }}
+          workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
+          workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
           sembix_studio_memory_role_arn: ${{ secrets.SEMBIX_STUDIO_MEMORY_ROLE_ARN }}
           sembix_studio_notification_role_arn: ${{ secrets.SEMBIX_STUDIO_NOTIFICATION_ROLE_ARN }}
 
