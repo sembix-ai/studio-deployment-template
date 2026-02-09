@@ -11,7 +11,7 @@ on:
         description: 'Terraform workflow version (tag, branch, or commit)'
         required: false
         type: string
-        default: 'v3.4.0'
+        default: 'v7.0.2'
       environment:
         description: 'Target environment (e.g., dev, prod, customer-specific)'
         required: true
@@ -161,7 +161,14 @@ jobs:
           custom_rds_proxy_sg_id: ${{ secrets.CUSTOM_RDS_PROXY_SG_ID }}
           custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
+          workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
+          workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
+          custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
+          custom_workspace_runtime_efs_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_EFS_SG_ID }}
+          certificate_arn: ${{ secrets.CERTIFICATE_ARN }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
+          bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
+          sembix_studio_cf_viewer_cert: ${{ secrets.SEMBIX_STUDIO_CF_VIEWER_CERT }}
 
   # Step 1c: Validate migrations configuration (runs only for migrations phase)
   validate-migrations:
@@ -250,7 +257,14 @@ jobs:
           custom_rds_proxy_sg_id: ${{ secrets.CUSTOM_RDS_PROXY_SG_ID }}
           custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
+          workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
+          workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
+          custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
+          custom_workspace_runtime_efs_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_EFS_SG_ID }}
+          certificate_arn: ${{ secrets.CERTIFICATE_ARN }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
+          bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
+          sembix_studio_cf_viewer_cert: ${{ secrets.SEMBIX_STUDIO_CF_VIEWER_CERT }}
 
   # Step 2: Bootstrap (conditional, first-time only)
   bootstrap:
@@ -384,7 +398,6 @@ jobs:
           custom_aurora_sg_id: ${{ secrets.CUSTOM_AURORA_SG_ID }}
           custom_rds_proxy_sg_id: ${{ secrets.CUSTOM_RDS_PROXY_SG_ID }}
           custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
-          custom_bastion_sg_id: ${{ secrets.CUSTOM_BASTION_SG_ID }}
           custom_bff_alb_sg_id: ${{ secrets.CUSTOM_BFF_ALB_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
           custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
@@ -401,23 +414,22 @@ jobs:
           semantic_event_engine_task_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_TASK_ROLE_ARN }}
           workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
           workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
-          sembix_studio_memory_role_arn: ${{ secrets.SEMBIX_STUDIO_MEMORY_ROLE_ARN }}
           sembix_studio_notification_role_arn: ${{ secrets.SEMBIX_STUDIO_NOTIFICATION_ROLE_ARN }}
 
           # TLS/SSL Certificates
           sembix_studio_cf_viewer_cert: ${{ secrets.SEMBIX_STUDIO_CF_VIEWER_CERT }}
+          certificate_arn: ${{ secrets.CERTIFICATE_ARN }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
+          bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
 
           # DNS & Route53
           hosted_zone_id: ${{ secrets.HOSTED_ZONE_ID }}
           cloudfront_domain: ${{ vars.CLOUDFRONT_DOMAIN }}
 
-          # Bastion Host
-          bastion_ami_id: ${{ secrets.BASTION_AMI_ID }}
-          bastion_ssh_key_name: ${{ secrets.BASTION_SSH_KEY_NAME }}
-
           # Storage & Artifacts
           sembix_studio_artifact_s3_bucket: ${{ secrets.SEMBIX_STUDIO_ARTIFACT_S3_BUCKET }}
+          sembix_studio_ui_bucket_name: ${{ secrets.SEMBIX_STUDIO_UI_BUCKET_NAME }}
+          sembix_artifacts_role_arn: ${{ secrets.SEMBIX_ARTIFACTS_ROLE_ARN }}
 
           # Frontend configuration.
           vite_github_app_client_id: ${{ vars.VITE_GITHUB_APP_CLIENT_ID }}
@@ -429,9 +441,10 @@ jobs:
 
           # Module Configuration
           enable_bpa: ${{ vars.ENABLE_BPA }}
-          deploy_sembix_studio_memory: ${{ vars.DEPLOY_SEMBIX_STUDIO_MEMORY }}
           deploy_sembix_studio_notifications: ${{ vars.DEPLOY_SEMBIX_STUDIO_NOTIFICATIONS }}
           enable_bff_waf: ${{ vars.ENABLE_BFF_WAF }}
+          run_migrations: 'true'
+          deploy_ui: 'true'
 
           # Approvers
           approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
