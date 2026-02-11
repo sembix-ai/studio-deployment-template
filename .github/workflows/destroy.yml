@@ -134,6 +134,7 @@ jobs:
           bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
           bff_alb_internal: ${{ secrets.BFF_ALB_INTERNAL }}
           bff_alb_ingress_cidr_blocks: ${{ secrets.BFF_ALB_INGRESS_CIDR_BLOCKS }}
+          private_ca_cert_secret_arn: ${{ secrets.PRIVATE_CA_CERT_SECRET_ARN }}
 
           # DNS & Route53
           hosted_zone_id: ${{ secrets.HOSTED_ZONE_ID }}
