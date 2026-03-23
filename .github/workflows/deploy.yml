@@ -29,6 +29,14 @@ on:
         description: 'Require manual approval before deploying'
         type: boolean
         default: true
+      cloud_provider:
+        description: 'Cloud provider to deploy to'
+        required: true
+        type: choice
+        default: aws
+        options:
+          - aws
+          - azure
 
 jobs:
   # Step 1a: Validate bootstrap configuration (runs only for bootstrap phase)
@@ -68,11 +76,26 @@ jobs:
         with:
           version: ${{ inputs.version }}
           environment: ${{ inputs.environment }}
+          cloud_provider: ${{ inputs.cloud_provider }}
           auth_method: 'oidc'
           aws_region: ${{ secrets.AWS_REGION }}
           tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
           customer_role_arn: ${{ secrets.CUSTOMER_ROLE_ARN }}
           iam_role_path: ${{ secrets.IAM_ROLE_PATH }}
+
+          # Azure Authentication
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          # Azure Configuration
+          azure_location: ${{ secrets.AZURE_LOCATION }}
+          azure_location_short: ${{ secrets.AZURE_LOCATION_SHORT }}
+
+          # Azure TF State
+          tf_storage_account_name: ${{ secrets.TF_STORAGE_ACCOUNT_NAME }}
+          tf_container_name: ${{ secrets.TF_CONTAINER_NAME }}
+          tf_resource_group_name: ${{ secrets.TF_RESOURCE_GROUP_NAME }}
 
   # Step 1b: Validate deploy configuration (runs only for deploy phase)
   validate-deploy:
@@ -111,6 +134,7 @@ jobs:
         with:
           version: ${{ inputs.version }}
           environment: ${{ inputs.environment }}
+          cloud_provider: ${{ inputs.cloud_provider }}
           auth_method: 'oidc'
           aws_region: ${{ secrets.AWS_REGION }}
           tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
@@ -161,17 +185,47 @@ jobs:
           custom_rds_proxy_sg_id: ${{ secrets.CUSTOM_RDS_PROXY_SG_ID }}
           custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
-          workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
-          workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
-          custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
           custom_workspace_runtime_efs_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_EFS_SG_ID }}
           certificate_arn: ${{ secrets.CERTIFICATE_ARN }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
-          bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
           bff_alb_internal: ${{ secrets.BFF_ALB_INTERNAL }}
           bff_alb_ingress_cidr_blocks: ${{ secrets.BFF_ALB_INGRESS_CIDR_BLOCKS }}
           private_ca_cert_secret_arn: ${{ secrets.PRIVATE_CA_CERT_SECRET_ARN }}
           sembix_studio_cf_viewer_cert: ${{ secrets.SEMBIX_STUDIO_CF_VIEWER_CERT }}
+
+          # Azure Authentication
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          # Azure Configuration
+          azure_location: ${{ secrets.AZURE_LOCATION }}
+
+          # Azure TF State
+          tf_storage_account_name: ${{ secrets.TF_STORAGE_ACCOUNT_NAME }}
+          tf_container_name: ${{ secrets.TF_CONTAINER_NAME }}
+          tf_resource_group_name: ${{ secrets.TF_RESOURCE_GROUP_NAME }}
+
+          # Azure Container Images
+          workflow_engine_image: ${{ secrets.WORKFLOW_ENGINE_IMAGE }}
+          bff_image: ${{ secrets.BFF_IMAGE }}
+          semantic_event_engine_image: ${{ secrets.SEMANTIC_EVENT_ENGINE_IMAGE }}
+          migrations_image: ${{ secrets.MIGRATIONS_IMAGE }}
+          workspace_runtime_image: ${{ secrets.WORKSPACE_RUNTIME_IMAGE }}
+
+          # Azure Database
+          postgres_admin_username: ${{ secrets.POSTGRES_ADMIN_USERNAME }}
+          postgres_database_name: ${{ secrets.POSTGRES_DATABASE_NAME }}
+
+          # Azure Bootstrap State
+          bootstrap_resource_group_name: ${{ secrets.BOOTSTRAP_RESOURCE_GROUP_NAME }}
+          bootstrap_storage_account_name: ${{ secrets.BOOTSTRAP_STORAGE_ACCOUNT_NAME }}
+          bootstrap_container_name: ${{ secrets.BOOTSTRAP_CONTAINER_NAME }}
+          bootstrap_state_key: ${{ secrets.BOOTSTRAP_STATE_KEY }}
+
+          # Azure Features
+          use_custom_identities: ${{ vars.USE_CUSTOM_IDENTITIES }}
+          use_custom_nsgs: ${{ vars.USE_CUSTOM_NSGS }}
 
   # Step 1c: Validate migrations configuration (runs only for migrations phase)
   validate-migrations:
@@ -210,6 +264,7 @@ jobs:
         with:
           version: ${{ inputs.version }}
           environment: ${{ inputs.environment }}
+          cloud_provider: ${{ inputs.cloud_provider }}
           auth_method: 'oidc'
           aws_region: ${{ secrets.AWS_REGION }}
           tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
@@ -260,17 +315,47 @@ jobs:
           custom_rds_proxy_sg_id: ${{ secrets.CUSTOM_RDS_PROXY_SG_ID }}
           custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
-          workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
-          workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
-          custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
           custom_workspace_runtime_efs_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_EFS_SG_ID }}
           certificate_arn: ${{ secrets.CERTIFICATE_ARN }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
-          bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
           bff_alb_internal: ${{ secrets.BFF_ALB_INTERNAL }}
           bff_alb_ingress_cidr_blocks: ${{ secrets.BFF_ALB_INGRESS_CIDR_BLOCKS }}
           private_ca_cert_secret_arn: ${{ secrets.PRIVATE_CA_CERT_SECRET_ARN }}
           sembix_studio_cf_viewer_cert: ${{ secrets.SEMBIX_STUDIO_CF_VIEWER_CERT }}
+
+          # Azure Authentication
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          # Azure Configuration
+          azure_location: ${{ secrets.AZURE_LOCATION }}
+
+          # Azure TF State
+          tf_storage_account_name: ${{ secrets.TF_STORAGE_ACCOUNT_NAME }}
+          tf_container_name: ${{ secrets.TF_CONTAINER_NAME }}
+          tf_resource_group_name: ${{ secrets.TF_RESOURCE_GROUP_NAME }}
+
+          # Azure Container Images
+          workflow_engine_image: ${{ secrets.WORKFLOW_ENGINE_IMAGE }}
+          bff_image: ${{ secrets.BFF_IMAGE }}
+          semantic_event_engine_image: ${{ secrets.SEMANTIC_EVENT_ENGINE_IMAGE }}
+          migrations_image: ${{ secrets.MIGRATIONS_IMAGE }}
+          workspace_runtime_image: ${{ secrets.WORKSPACE_RUNTIME_IMAGE }}
+
+          # Azure Database
+          postgres_admin_username: ${{ secrets.POSTGRES_ADMIN_USERNAME }}
+          postgres_database_name: ${{ secrets.POSTGRES_DATABASE_NAME }}
+
+          # Azure Bootstrap State
+          bootstrap_resource_group_name: ${{ secrets.BOOTSTRAP_RESOURCE_GROUP_NAME }}
+          bootstrap_storage_account_name: ${{ secrets.BOOTSTRAP_STORAGE_ACCOUNT_NAME }}
+          bootstrap_container_name: ${{ secrets.BOOTSTRAP_CONTAINER_NAME }}
+          bootstrap_state_key: ${{ secrets.BOOTSTRAP_STATE_KEY }}
+
+          # Azure Features
+          use_custom_identities: ${{ vars.USE_CUSTOM_IDENTITIES }}
+          use_custom_nsgs: ${{ vars.USE_CUSTOM_NSGS }}
 
   # Step 2: Bootstrap (conditional, first-time only)
   bootstrap:
@@ -310,6 +395,7 @@ jobs:
         with:
           version: ${{ inputs.version }}
           environment: ${{ inputs.environment }}
+          cloud_provider: ${{ inputs.cloud_provider }}
           require_approval: ${{ inputs.require_approval }}
           aws_region: ${{ secrets.AWS_REGION }}
           tf_bucket_name: ${{ vars.TF_BUCKET_NAME }}
@@ -317,6 +403,20 @@ jobs:
           github_token: ${{ steps.generate-token.outputs.token }}
           approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
           iam_role_path: ${{ secrets.IAM_ROLE_PATH }}
+
+          # Azure Authentication
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          # Azure Configuration
+          azure_location: ${{ secrets.AZURE_LOCATION }}
+          azure_location_short: ${{ secrets.AZURE_LOCATION_SHORT }}
+
+          # Azure TF State
+          tf_storage_account_name: ${{ secrets.TF_STORAGE_ACCOUNT_NAME }}
+          tf_container_name: ${{ secrets.TF_CONTAINER_NAME }}
+          tf_resource_group_name: ${{ secrets.TF_RESOURCE_GROUP_NAME }}
 
   # Step 3: Deploy infrastructure and application
   deploy:
@@ -356,6 +456,7 @@ jobs:
         with:
           version: ${{ inputs.version }}
           environment: ${{ inputs.environment }}
+          cloud_provider: ${{ inputs.cloud_provider }}
           require_approval: ${{ inputs.require_approval }}
           github_token: ${{ steps.generate-token.outputs.token }}
 
@@ -406,7 +507,6 @@ jobs:
           custom_bff_ecs_sg_id: ${{ secrets.CUSTOM_BFF_ECS_SG_ID }}
           custom_bff_alb_sg_id: ${{ secrets.CUSTOM_BFF_ALB_SG_ID }}
           custom_semantic_event_engine_sg_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_SG_ID }}
-          custom_workspace_runtime_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_SG_ID }}
           custom_workspace_runtime_efs_sg_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_EFS_SG_ID }}
 
           # IAM Roles & Policies
@@ -418,15 +518,12 @@ jobs:
           rds_proxy_role_arn: ${{ secrets.RDS_PROXY_ROLE_ARN }}
           semantic_event_engine_execution_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_EXECUTION_ROLE_ARN }}
           semantic_event_engine_task_role_arn: ${{ secrets.SEMANTIC_EVENT_ENGINE_TASK_ROLE_ARN }}
-          workspace_runtime_execution_role_arn: ${{ secrets.WORKSPACE_RUNTIME_EXECUTION_ROLE_ARN }}
-          workspace_runtime_task_role_arn: ${{ secrets.WORKSPACE_RUNTIME_TASK_ROLE_ARN }}
           sembix_studio_notification_role_arn: ${{ secrets.SEMBIX_STUDIO_NOTIFICATION_ROLE_ARN }}
 
           # TLS/SSL Certificates
           sembix_studio_cf_viewer_cert: ${{ secrets.SEMBIX_STUDIO_CF_VIEWER_CERT }}
           certificate_arn: ${{ secrets.CERTIFICATE_ARN }}
           bff_alb_certificate_arn: ${{ secrets.BFF_ALB_CERTIFICATE_ARN }}
-          bff_internal_alb_certificate_arn: ${{ secrets.BFF_INTERNAL_ALB_CERTIFICATE_ARN }}
           bff_alb_internal: ${{ secrets.BFF_ALB_INTERNAL }}
           bff_alb_ingress_cidr_blocks: ${{ secrets.BFF_ALB_INGRESS_CIDR_BLOCKS }}
           private_ca_cert_secret_arn: ${{ secrets.PRIVATE_CA_CERT_SECRET_ARN }}
@@ -457,6 +554,47 @@ jobs:
 
           # Approvers
           approvers: ${{ secrets.DEPLOYMENT_APPROVERS }}
+
+          # Azure Authentication
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+          # Azure Configuration
+          azure_location: ${{ secrets.AZURE_LOCATION }}
+          azure_location_short: ${{ secrets.AZURE_LOCATION_SHORT }}
+
+          # Azure TF State
+          tf_storage_account_name: ${{ secrets.TF_STORAGE_ACCOUNT_NAME }}
+          tf_container_name: ${{ secrets.TF_CONTAINER_NAME }}
+          tf_resource_group_name: ${{ secrets.TF_RESOURCE_GROUP_NAME }}
+
+          # Azure Container Images
+          workflow_engine_image: ${{ secrets.WORKFLOW_ENGINE_IMAGE }}
+          bff_image: ${{ secrets.BFF_IMAGE }}
+          semantic_event_engine_image: ${{ secrets.SEMANTIC_EVENT_ENGINE_IMAGE }}
+          migrations_image: ${{ secrets.MIGRATIONS_IMAGE }}
+          workspace_runtime_image: ${{ secrets.WORKSPACE_RUNTIME_IMAGE }}
+
+          # Azure Database
+          postgres_admin_username: ${{ secrets.POSTGRES_ADMIN_USERNAME }}
+          postgres_database_name: ${{ secrets.POSTGRES_DATABASE_NAME }}
+
+          # Azure Bootstrap State
+          bootstrap_resource_group_name: ${{ secrets.BOOTSTRAP_RESOURCE_GROUP_NAME }}
+          bootstrap_storage_account_name: ${{ secrets.BOOTSTRAP_STORAGE_ACCOUNT_NAME }}
+          bootstrap_container_name: ${{ secrets.BOOTSTRAP_CONTAINER_NAME }}
+          bootstrap_state_key: ${{ secrets.BOOTSTRAP_STATE_KEY }}
+
+          # Azure CDN / Front Door
+          front_door_custom_domain: ${{ secrets.FRONT_DOOR_CUSTOM_DOMAIN }}
+          front_door_custom_domain_dns_zone_id: ${{ secrets.FRONT_DOOR_CUSTOM_DOMAIN_DNS_ZONE_ID }}
+
+          # Azure Features
+          enable_application_insights: ${{ vars.ENABLE_APPLICATION_INSIGHTS }}
+          enable_private_endpoints: ${{ vars.ENABLE_PRIVATE_ENDPOINTS }}
+          use_custom_identities: ${{ vars.USE_CUSTOM_IDENTITIES }}
+          use_custom_nsgs: ${{ vars.USE_CUSTOM_NSGS }}
 
   # Step 4: Run migrations only
   run-migrations:
