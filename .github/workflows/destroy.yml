@@ -194,5 +194,20 @@ jobs:
           # Azure Features
           enable_application_insights: ${{ vars.ENABLE_APPLICATION_INSIGHTS }}
           enable_private_endpoints: ${{ vars.ENABLE_PRIVATE_ENDPOINTS }}
-          use_custom_identities: ${{ vars.USE_CUSTOM_IDENTITIES }}
-          use_custom_nsgs: ${{ vars.USE_CUSTOM_NSGS }}
+
+          # Azure Custom Identities
+          custom_workflow_engine_identity_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_IDENTITY_ID }}
+          custom_workflow_engine_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
+          custom_workflow_engine_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
+          custom_bff_identity_id: ${{ secrets.CUSTOM_BFF_IDENTITY_ID }}
+          custom_bff_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
+          custom_bff_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
+          custom_semantic_event_engine_identity_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_IDENTITY_ID }}
+          custom_semantic_event_engine_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
+          custom_semantic_event_engine_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
+          custom_workspace_runtime_identity_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_IDENTITY_ID }}
+          custom_workspace_runtime_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
+          custom_workspace_runtime_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
+          custom_migrations_identity_id: ${{ secrets.CUSTOM_MIGRATIONS_IDENTITY_ID }}
+          custom_migrations_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
+          custom_migrations_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
