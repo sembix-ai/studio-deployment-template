@@ -158,6 +158,8 @@ jobs:
           sembix_hub_app_config_env_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_ENV_ID }}
           sembix_hub_app_config_profile_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_PROFILE_ID }}
           sembix_hub_engine_execution_role: ${{ secrets.SEMBIX_HUB_ENGINE_EXECUTION_ROLE }}
+          customer_portal_hub_base_url: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_API_URL }}
+          customer_portal_hub_role_arn: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_ROLE_ARN }}
 
           # Database
           sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
@@ -225,20 +227,20 @@ jobs:
 
           # Azure Custom Identities
           custom_workflow_engine_identity_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_IDENTITY_ID }}
-          custom_workflow_engine_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
-          custom_workflow_engine_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
+          custom_workflow_engine_identity_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
+          custom_workflow_engine_identity_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
           custom_bff_identity_id: ${{ secrets.CUSTOM_BFF_IDENTITY_ID }}
-          custom_bff_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
-          custom_bff_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
+          custom_bff_identity_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
+          custom_bff_identity_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
           custom_semantic_event_engine_identity_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_IDENTITY_ID }}
-          custom_semantic_event_engine_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
-          custom_semantic_event_engine_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
+          custom_semantic_event_engine_identity_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
+          custom_semantic_event_engine_identity_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
           custom_workspace_runtime_identity_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_IDENTITY_ID }}
-          custom_workspace_runtime_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
-          custom_workspace_runtime_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
+          custom_workspace_runtime_identity_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
+          custom_workspace_runtime_identity_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
           custom_migrations_identity_id: ${{ secrets.CUSTOM_MIGRATIONS_IDENTITY_ID }}
-          custom_migrations_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
-          custom_migrations_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
+          custom_migrations_identity_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
+          custom_migrations_identity_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
 
   # Step 1c: Validate migrations configuration (runs only for migrations phase)
   validate-migrations:
@@ -301,6 +303,8 @@ jobs:
           sembix_hub_app_config_env_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_ENV_ID }}
           sembix_hub_app_config_profile_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_PROFILE_ID }}
           sembix_hub_engine_execution_role: ${{ secrets.SEMBIX_HUB_ENGINE_EXECUTION_ROLE }}
+          customer_portal_hub_base_url: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_API_URL }}
+          customer_portal_hub_role_arn: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_ROLE_ARN }}
 
           # Database
           sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
@@ -368,20 +372,20 @@ jobs:
 
           # Azure Custom Identities
           custom_workflow_engine_identity_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_IDENTITY_ID }}
-          custom_workflow_engine_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
-          custom_workflow_engine_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
+          custom_workflow_engine_identity_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
+          custom_workflow_engine_identity_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
           custom_bff_identity_id: ${{ secrets.CUSTOM_BFF_IDENTITY_ID }}
-          custom_bff_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
-          custom_bff_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
+          custom_bff_identity_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
+          custom_bff_identity_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
           custom_semantic_event_engine_identity_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_IDENTITY_ID }}
-          custom_semantic_event_engine_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
-          custom_semantic_event_engine_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
+          custom_semantic_event_engine_identity_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
+          custom_semantic_event_engine_identity_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
           custom_workspace_runtime_identity_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_IDENTITY_ID }}
-          custom_workspace_runtime_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
-          custom_workspace_runtime_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
+          custom_workspace_runtime_identity_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
+          custom_workspace_runtime_identity_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
           custom_migrations_identity_id: ${{ secrets.CUSTOM_MIGRATIONS_IDENTITY_ID }}
-          custom_migrations_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
-          custom_migrations_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
+          custom_migrations_identity_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
+          custom_migrations_identity_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
 
   # Step 2: Bootstrap (conditional, first-time only)
   bootstrap:
@@ -509,6 +513,32 @@ jobs:
           sembix_hub_app_config_env_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_ENV_ID }}
           sembix_hub_app_config_profile_id: ${{ secrets.SEMBIX_HUB_APP_CONFIG_PROFILE_ID }}
           sembix_hub_engine_execution_role: ${{ secrets.SEMBIX_HUB_ENGINE_EXECUTION_ROLE }}
+          customer_portal_hub_base_url: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_API_URL }}
+          customer_portal_hub_role_arn: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_ROLE_ARN }}
+
+          # Billing / Licensing (AWS)
+          billing_engine_image_tag: ${{ secrets.BILLING_ENGINE_IMAGE_TAG }}
+          billing_hub_role_arn: ${{ secrets.BILLING_HUB_ROLE_ARN }}
+          billing_hub_api_gateway_url: ${{ secrets.BILLING_HUB_API_GATEWAY_URL }}
+          billing_license_key_secret_arn: ${{ secrets.BILLING_LICENSE_KEY_SECRET_ARN }}
+          billing_instance_id: ${{ secrets.BILLING_INSTANCE_ID }}
+          billing_enabled: ${{ vars.BILLING_ENABLED }}
+          license_refresh_interval_ms: ${{ vars.LICENSE_REFRESH_INTERVAL_MS }}
+          billing_config_poll_interval_ms: ${{ vars.BILLING_CONFIG_POLL_INTERVAL_MS }}
+          billing_telemetry_poll_interval_ms: ${{ vars.BILLING_TELEMETRY_POLL_INTERVAL_MS }}
+          sembix_operator_emails: ${{ vars.SEMBIX_OPERATOR_EMAILS }}
+
+          # Billing (Azure)
+          billing_engine_image: ${{ secrets.BILLING_ENGINE_IMAGE }}
+          billing_license_key_secret_name: ${{ secrets.BILLING_LICENSE_KEY_SECRET_NAME }}
+
+          # Microsoft Graph (user-invite, optional)
+          azure_graph_client_id: ${{ secrets.AZURE_GRAPH_CLIENT_ID }}
+          azure_graph_client_secret_arn: ${{ secrets.AZURE_GRAPH_CLIENT_SECRET_ARN }}
+          azure_graph_client_secret_name: ${{ secrets.AZURE_GRAPH_CLIENT_SECRET_NAME }}
+
+          # Application Configuration
+          org_admin_email: ${{ secrets.ORG_ADMIN_EMAIL }}
 
           # Database Configuration
           sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
@@ -622,20 +652,20 @@ jobs:
 
           # Azure Custom Identities
           custom_workflow_engine_identity_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_IDENTITY_ID }}
-          custom_workflow_engine_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
-          custom_workflow_engine_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
+          custom_workflow_engine_identity_principal_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_PRINCIPAL_ID }}
+          custom_workflow_engine_identity_client_id: ${{ secrets.CUSTOM_WORKFLOW_ENGINE_CLIENT_ID }}
           custom_bff_identity_id: ${{ secrets.CUSTOM_BFF_IDENTITY_ID }}
-          custom_bff_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
-          custom_bff_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
+          custom_bff_identity_principal_id: ${{ secrets.CUSTOM_BFF_PRINCIPAL_ID }}
+          custom_bff_identity_client_id: ${{ secrets.CUSTOM_BFF_CLIENT_ID }}
           custom_semantic_event_engine_identity_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_IDENTITY_ID }}
-          custom_semantic_event_engine_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
-          custom_semantic_event_engine_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
+          custom_semantic_event_engine_identity_principal_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_PRINCIPAL_ID }}
+          custom_semantic_event_engine_identity_client_id: ${{ secrets.CUSTOM_SEMANTIC_EVENT_ENGINE_CLIENT_ID }}
           custom_workspace_runtime_identity_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_IDENTITY_ID }}
-          custom_workspace_runtime_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
-          custom_workspace_runtime_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
+          custom_workspace_runtime_identity_principal_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_PRINCIPAL_ID }}
+          custom_workspace_runtime_identity_client_id: ${{ secrets.CUSTOM_WORKSPACE_RUNTIME_CLIENT_ID }}
           custom_migrations_identity_id: ${{ secrets.CUSTOM_MIGRATIONS_IDENTITY_ID }}
-          custom_migrations_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
-          custom_migrations_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
+          custom_migrations_identity_principal_id: ${{ secrets.CUSTOM_MIGRATIONS_PRINCIPAL_ID }}
+          custom_migrations_identity_client_id: ${{ secrets.CUSTOM_MIGRATIONS_CLIENT_ID }}
 
   # Step 4: Run migrations only
   run-migrations:
