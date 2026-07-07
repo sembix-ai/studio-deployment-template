@@ -161,6 +161,37 @@ jobs:
           customer_portal_hub_base_url: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_API_URL }}
           customer_portal_hub_role_arn: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_ROLE_ARN }}
 
+          # Billing / Licensing (AWS)
+          billing_hub_role_arn: ${{ secrets.BILLING_HUB_ROLE_ARN }}
+          billing_hub_api_gateway_url: ${{ secrets.BILLING_HUB_API_GATEWAY_URL }}
+          billing_license_key_secret_arn: ${{ secrets.BILLING_LICENSE_KEY_SECRET_ARN }}
+          billing_instance_id: ${{ secrets.BILLING_INSTANCE_ID }}
+          billing_enabled: ${{ vars.BILLING_ENABLED }}
+          license_refresh_interval_ms: ${{ vars.LICENSE_REFRESH_INTERVAL_MS }}
+          billing_config_poll_interval_ms: ${{ vars.BILLING_CONFIG_POLL_INTERVAL_MS }}
+          billing_telemetry_poll_interval_ms: ${{ vars.BILLING_TELEMETRY_POLL_INTERVAL_MS }}
+          sembix_operator_emails: ${{ vars.SEMBIX_OPERATOR_EMAILS }}
+
+          # Billing (Azure)
+          billing_engine_image: ${{ secrets.BILLING_ENGINE_IMAGE }}
+          billing_license_key_secret_name: ${{ secrets.BILLING_LICENSE_KEY_SECRET_NAME }}
+
+          # Microsoft Graph (optional)
+          azure_graph_client_id: ${{ secrets.AZURE_GRAPH_CLIENT_ID }}
+          azure_graph_client_secret_arn: ${{ secrets.AZURE_GRAPH_CLIENT_SECRET_ARN }}
+          azure_graph_client_secret_name: ${{ secrets.AZURE_GRAPH_CLIENT_SECRET_NAME }}
+
+          # Email / Notifications (optional — unset disables email; AWS: ses|smtp, Azure: azure|smtp)
+          email_transport: ${{ vars.EMAIL_TRANSPORT }}
+          email_from: ${{ vars.EMAIL_FROM }}
+          email_reply_to: ${{ vars.EMAIL_REPLY_TO }}
+          smtp_host: ${{ vars.SMTP_HOST }}
+          smtp_port: ${{ vars.SMTP_PORT }}
+          smtp_secure: ${{ vars.SMTP_SECURE }}
+          smtp_user: ${{ vars.SMTP_USER }}
+          acs_data_location: ${{ vars.ACS_DATA_LOCATION }}
+          hosted_zone_id: ${{ secrets.HOSTED_ZONE_ID }}
+
           # Database
           sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
           sembix_studio_user: ${{ secrets.SEMBIX_STUDIO_USER }}
@@ -305,6 +336,37 @@ jobs:
           sembix_hub_engine_execution_role: ${{ secrets.SEMBIX_HUB_ENGINE_EXECUTION_ROLE }}
           customer_portal_hub_base_url: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_API_URL }}
           customer_portal_hub_role_arn: ${{ secrets.CUSTOMER_PORTAL_CENTRAL_HUB_ROLE_ARN }}
+
+          # Billing / Licensing (AWS)
+          billing_hub_role_arn: ${{ secrets.BILLING_HUB_ROLE_ARN }}
+          billing_hub_api_gateway_url: ${{ secrets.BILLING_HUB_API_GATEWAY_URL }}
+          billing_license_key_secret_arn: ${{ secrets.BILLING_LICENSE_KEY_SECRET_ARN }}
+          billing_instance_id: ${{ secrets.BILLING_INSTANCE_ID }}
+          billing_enabled: ${{ vars.BILLING_ENABLED }}
+          license_refresh_interval_ms: ${{ vars.LICENSE_REFRESH_INTERVAL_MS }}
+          billing_config_poll_interval_ms: ${{ vars.BILLING_CONFIG_POLL_INTERVAL_MS }}
+          billing_telemetry_poll_interval_ms: ${{ vars.BILLING_TELEMETRY_POLL_INTERVAL_MS }}
+          sembix_operator_emails: ${{ vars.SEMBIX_OPERATOR_EMAILS }}
+
+          # Billing (Azure)
+          billing_engine_image: ${{ secrets.BILLING_ENGINE_IMAGE }}
+          billing_license_key_secret_name: ${{ secrets.BILLING_LICENSE_KEY_SECRET_NAME }}
+
+          # Microsoft Graph (optional)
+          azure_graph_client_id: ${{ secrets.AZURE_GRAPH_CLIENT_ID }}
+          azure_graph_client_secret_arn: ${{ secrets.AZURE_GRAPH_CLIENT_SECRET_ARN }}
+          azure_graph_client_secret_name: ${{ secrets.AZURE_GRAPH_CLIENT_SECRET_NAME }}
+
+          # Email / Notifications (optional — unset disables email; AWS: ses|smtp, Azure: azure|smtp)
+          email_transport: ${{ vars.EMAIL_TRANSPORT }}
+          email_from: ${{ vars.EMAIL_FROM }}
+          email_reply_to: ${{ vars.EMAIL_REPLY_TO }}
+          smtp_host: ${{ vars.SMTP_HOST }}
+          smtp_port: ${{ vars.SMTP_PORT }}
+          smtp_secure: ${{ vars.SMTP_SECURE }}
+          smtp_user: ${{ vars.SMTP_USER }}
+          acs_data_location: ${{ vars.ACS_DATA_LOCATION }}
+          hosted_zone_id: ${{ secrets.HOSTED_ZONE_ID }}
 
           # Database
           sembix_studio_db_name: ${{ secrets.SEMBIX_STUDIO_DB_NAME }}
@@ -587,6 +649,16 @@ jobs:
           # DNS & Route53
           hosted_zone_id: ${{ secrets.HOSTED_ZONE_ID }}
           cloudfront_domain: ${{ vars.CLOUDFRONT_DOMAIN }}
+
+          # Email / Notifications (optional — unset disables email; AWS: ses|smtp, Azure: azure|smtp)
+          email_transport: ${{ vars.EMAIL_TRANSPORT }}
+          email_from: ${{ vars.EMAIL_FROM }}
+          email_reply_to: ${{ vars.EMAIL_REPLY_TO }}
+          smtp_host: ${{ vars.SMTP_HOST }}
+          smtp_port: ${{ vars.SMTP_PORT }}
+          smtp_secure: ${{ vars.SMTP_SECURE }}
+          smtp_user: ${{ vars.SMTP_USER }}
+          acs_data_location: ${{ vars.ACS_DATA_LOCATION }}
 
           # Storage & Artifacts
           sembix_studio_artifact_s3_bucket: ${{ secrets.SEMBIX_STUDIO_ARTIFACT_S3_BUCKET }}

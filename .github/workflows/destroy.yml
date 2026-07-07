@@ -152,6 +152,15 @@ jobs:
           hosted_zone_id: ${{ secrets.HOSTED_ZONE_ID }}
           cloudfront_domain: ${{ vars.CLOUDFRONT_DOMAIN }}
 
+          # Email / Notifications (optional — unset disables email; AWS: ses|smtp, Azure: azure|smtp)
+          email_transport: ${{ vars.EMAIL_TRANSPORT }}
+          email_from: ${{ vars.EMAIL_FROM }}
+          email_reply_to: ${{ vars.EMAIL_REPLY_TO }}
+          smtp_host: ${{ vars.SMTP_HOST }}
+          smtp_port: ${{ vars.SMTP_PORT }}
+          smtp_secure: ${{ vars.SMTP_SECURE }}
+          smtp_user: ${{ vars.SMTP_USER }}
+
           # Logging
           log_level: ${{ secrets.LOG_LEVEL }}
 
