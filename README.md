@@ -178,7 +178,7 @@ When `deployment_phase` is set to **deploy**:
    - Deploys infrastructure via Terraform
    - Sets up VPC, subnets, and security groups (if not using custom)
    - Creates Aurora PostgreSQL database with RDS Proxy
-   - Deploys ECS services (workflow engine, BFF)
+   - Deploys ECS services (BFF, semantic event engine, workspace runtime)
    - Runs database migrations
    - Deploys UI to S3/CloudFront
    - Configures Application Load Balancer and DNS
